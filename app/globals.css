@@ -24,3 +24,50 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.react-calendar-heatmap svg {
+  background-color: transparent;
+}
+
+.react-calendar-heatmap .color-empty { 
+  fill: #0a0a0a !important;
+  stroke: black; 
+  stroke-width: 1px;
+  border-radius: 4;
+}
+
+.react-calendar-heatmap .color-scale-1 { fill: #0d3c14; }
+.react-calendar-heatmap .color-scale-2 { fill: #1a5622; }
+.react-calendar-heatmap .color-scale-3 { fill: #267030; }
+.react-calendar-heatmap .color-scale-4 { fill: #338a3e; }
+.react-calendar-heatmap .color-scale-5 { fill: #40a346; }
+.react-calendar-heatmap .color-scale-6 { fill: #5aa959; }
+.react-calendar-heatmap .color-scale-7 { fill: #7bc96f; }
+.react-calendar-heatmap .color-scale-8 { fill: #9be9a8; }
+.react-calendar-heatmap .color-scale-9 { fill: #c6e48b; }
+.react-calendar-heatmap .color-scale-10 { fill: #d6e685; }
+
+.react-calendar-heatmap text {
+  fill: #8b949e;
+  font-size: 10px;
+}
+
+.react-calendar-heatmap rect:hover {
+  stroke: #58a6ff;
+  stroke-width: 2px;
+}
+
+.cal-container {
+    width: 900px;
+}
+
+input[type="number"] {
+  -webkit-appearance: textfield;
+     -moz-appearance: textfield;
+          appearance: textfield;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none;
+}
+
