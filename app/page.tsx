@@ -105,12 +105,12 @@ export default function Home() {
             startDate={new Date('2025-01-01')}
             endDate={new Date('2025-12-31')}
             values={days[selectedOption] || []}
-            onClick={(value: DayData | undefined) => { 
+            onClick={(value) => { 
               if (value) {
                 alert(`Date: ${value.date}, Count: ${value.count}`);
               }
             }}
-            classForValue={(value: DayData | undefined) => {
+            classForValue={(value) => {
               if (!value || value.count === 0) {
                 return 'color-empty';
               }
