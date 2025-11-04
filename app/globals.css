@@ -58,7 +58,9 @@ body {
 }
 
 .cal-container {
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
+    display: block;
 }
 
 input[type="number"] {

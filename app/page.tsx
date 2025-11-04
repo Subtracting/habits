@@ -42,6 +42,8 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [days, setDays] = useState<DaysState>({});
 
+  const [screenWidth, setScreenWidth] = useState<number>(0);
+
   useEffect(() => {
       const saved = localStorage.getItem('habits-data');
       if (saved) {
@@ -57,6 +59,13 @@ export default function Home() {
           });
           return all;
         });
+      };
+
+      const handleResize = () => setScreenWidth(window.innerWidth);
+
+      window.addEventListener('resize', handleResize);
+      return () => {
+          window.removeEventListener('resize', handleResize);
       }
   }, []);
 
@@ -159,6 +168,7 @@ export default function Home() {
         </div>
           
           <CalendarHeatmap
+            horizontal={screenWidth > 786 || screenWidth == 0}
             startDate={new Date('2025-01-01')}
             endDate={new Date('2025-12-31')}
             values={selectedOption ? days[selectedOption.value] || [] : []}
