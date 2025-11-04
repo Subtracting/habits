@@ -62,7 +62,7 @@ export default function Home() {
       };
 
       const handleResize = () => setScreenWidth(window.innerWidth);
-
+      handleResize();
       window.addEventListener('resize', handleResize);
       return () => {
           window.removeEventListener('resize', handleResize);
