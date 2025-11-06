@@ -38,6 +38,9 @@ const defaultOptions = [
 export default function Home() {
   const [options, setOptions] = useState(defaultOptions);
   const [selectedOption, setSelectedOption] = useState<Option | null>();
+  const [selectedMinValue, setSelectedMinValue] = useState(0);
+  const [selectedMaxValue, setSelectedMaxValue] = useState(0);
+
   const [countValue, setCountValue] = useState<number>(1);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [days, setDays] = useState<DaysState>({});
@@ -75,9 +78,9 @@ export default function Home() {
       setSelectedOption(newOption);
   };
 
-  const updateDays = (selectedOption: string, selectedDate: Date, countValue: number) => {
+  const updateDays = (selectedOptionValue: string, selectedDate: Date, countValue: number) => {
     setDays(prev => {
-      const habitDays = prev[selectedOption] || [];
+      const habitDays = prev[selectedOptionValue] || [];
       const dateStr = selectedDate.toISOString().split('T')[0]; // '2025-11-01'
       const existingIndex = habitDays.findIndex((d: DayData) => d.date === dateStr);
       
@@ -86,11 +89,25 @@ export default function Home() {
             i === existingIndex ? { ...d, count: d.count + countValue } : d
           )
         : [...habitDays, { date: dateStr, count: countValue }];
-      const newState = { ...prev, [selectedOption]: updated };
-      
+      const newState = { ...prev, [selectedOptionValue]: updated };
+        
+      handleSelectUpdate(selectedOption ? selectedOption : null);
       localStorage.setItem('habits-data', JSON.stringify(newState));
+
       return newState;
     });
+  };
+
+  const handleSelectUpdate = (newSelectedOption: Option | null) => {
+      setSelectedOption(newSelectedOption);
+
+      const selectedKey = newSelectedOption ? newSelectedOption.value : "";
+      const minValue = Math.min(...days[selectedKey].map((item: DayData) => item.count));
+      const maxValue = Math.max(...days[selectedKey].map((item: DayData) => item.count));
+
+      setSelectedMinValue(minValue);
+      setSelectedMaxValue(maxValue);
+
   };
 
   return (
@@ -117,7 +134,7 @@ export default function Home() {
 
         <CreatableSelect
             isClearable
-            onChange={(newValue) => setSelectedOption(newValue)}
+            onChange={(newValue) => handleSelectUpdate(newValue)}
             onCreateOption={handleCreate}
             options={options}
             value={selectedOption}
@@ -178,10 +195,15 @@ export default function Home() {
               }
             }}
             classForValue={(value) => {
-              if (!value || value.count === 0) {
-                return 'color-empty';
-              }
-              return `color-scale-${Math.min(value.count, 10)}`;
+              if (!value || value.count === 0) return 'color-empty';
+
+              const range = selectedMaxValue - selectedMinValue;
+              if (range <= 0) return value.count > 0 ? 'color-scale-1' : 'color-scale-10';
+
+              const normalized = (value.count - selectedMinValue) / range;
+              const idx = Math.min(10, Math.max(1, Math.ceil(normalized * 10)));
+
+              return `color-scale-${idx}`;
             }}
           />
         </div>
