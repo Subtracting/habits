@@ -2,27 +2,16 @@
 
 import { useState, useEffect } from 'react';
 
-import CreatableSelect from 'react-select/creatable';
-import CalendarHeatmap from 'react-calendar-heatmap';
 import DatePicker from 'react-datepicker';
+import HeatMap from './components/HeatMap';
+import InputSelect from './components/InputSelect';
+
+import type { Option } from '@/types/option.types';
+import type { DaysState, DayData } from '@/types/days.types';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import 'react-calendar-heatmap/dist/styles.css';
 import './datepicker-dark.css';
-
-interface Option {
-    readonly label: string;
-    readonly value: string;
-}
-
-interface DayData {
-    date: string;
-    count: number;
-}
-
-interface DaysState {
-    [key: string]: DayData[];
-}
+import DeletePopup from './components/DeletePopup';
 
 const createOption = (label: string) => ({
     label,
@@ -36,10 +25,10 @@ const defaultOptions = [
 ];
 
 export default function Home() {
-  const [options, setOptions] = useState(defaultOptions);
-  const [selectedOption, setSelectedOption] = useState<Option | null>();
-  const [selectedMinValue, setSelectedMinValue] = useState(0);
-  const [selectedMaxValue, setSelectedMaxValue] = useState(0);
+  const [options, setOptions] = useState<Option[]>(defaultOptions);
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+  const [selectedMinValue, setSelectedMinValue] = useState<number>(0);
+  const [selectedMaxValue, setSelectedMaxValue] = useState<number>(0);
 
   const [countValue, setCountValue] = useState<number>(1);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -78,8 +67,20 @@ export default function Home() {
       setSelectedOption(newOption);
   };
 
-  const updateDays = (selectedOptionValue: string, selectedDate: Date, countValue: number) => {
+  const computeMinMax = (newSelectedOption: string) => {
+      const selectedKey = newSelectedOption ? newSelectedOption : "";
+
+      if (!days[selectedKey] || days[selectedKey].length === 0) {
+          return { minValue: 0, maxValue: 0 };
+      }
+      const minValue = Math.min(...days[selectedKey].map((item: DayData) => item.count));
+      const maxValue = Math.max(...days[selectedKey].map((item: DayData) => item.count));
+    return { minValue, maxValue };
+  };
+
+  const updateDays = (selectedDate: Date, countValue: number) => {
     setDays(prev => {
+      const selectedOptionValue = selectedOption ? selectedOption.value : "";
       const habitDays = prev[selectedOptionValue] || [];
       const dateStr = selectedDate.toISOString().split('T')[0]; // '2025-11-01'
       const existingIndex = habitDays.findIndex((d: DayData) => d.date === dateStr);
@@ -91,7 +92,11 @@ export default function Home() {
         : [...habitDays, { date: dateStr, count: countValue }];
       const newState = { ...prev, [selectedOptionValue]: updated };
         
-      handleSelectUpdate(selectedOption ? selectedOption : null);
+      const { minValue, maxValue } = computeMinMax(selectedOptionValue); 
+
+      setSelectedMinValue(minValue);
+      setSelectedMaxValue(maxValue);
+
       localStorage.setItem('habits-data', JSON.stringify(newState));
 
       return newState;
@@ -100,10 +105,8 @@ export default function Home() {
 
   const handleSelectUpdate = (newSelectedOption: Option | null) => {
       setSelectedOption(newSelectedOption);
-
-      const selectedKey = newSelectedOption ? newSelectedOption.value : "";
-      const minValue = Math.min(...days[selectedKey].map((item: DayData) => item.count));
-      const maxValue = Math.max(...days[selectedKey].map((item: DayData) => item.count));
+    
+      const { minValue, maxValue } = computeMinMax(newSelectedOption ? newSelectedOption.value : "");
 
       setSelectedMinValue(minValue);
       setSelectedMaxValue(maxValue);
@@ -123,89 +126,37 @@ export default function Home() {
         />
 
         <div className='cal-container'>
-        <div className='flex'>
+            <InputSelect
+               countValue={countValue}
+               setCountValue={setCountValue}
+               handleSelectUpdate={handleSelectUpdate}
+               handleCreate={handleCreate}
+               options={options}
+               selectedOption={selectedOption}
+               >
+            </InputSelect>
+              
+            <div>
+              <button 
+                onClick={() => updateDays(selectedDate, countValue)}
+                className='my-4 bg-black hover:bg-zinc-950 text-zinc-100 hover:text-zinc-100 border-zinc-900 hover:border-zinc-700 border-2 px-4 py-1 rounded'
+              >
+                submit 
+              </button>
+              <DeletePopup
+                setDays={setDays}
+                selectedOptionValue={selectedOption ? selectedOption.value : ""}
+                ></DeletePopup>
+            </div>
 
-          <input 
-            type='number' 
-            value={countValue}
-            onChange={(e) => setCountValue(Number(e.target.value))} 
-            className='w-16 my-4 bg-zinc-950 text-zinc-100 bborder-2 px-4 py-1 mr-4 rounded'
-            />
-
-        <CreatableSelect
-            isClearable
-            onChange={(newValue) => handleSelectUpdate(newValue)}
-            onCreateOption={handleCreate}
-            options={options}
-            value={selectedOption}
-            placeholder="Add habit..."
-            className="my-4 mr-4"
-            styles={{
-                input: base => ({
-                  ...base,
-                  color: "white",
-                }),
-                singleValue: base => ({
-                  ...base,
-                  color: "white",
-                }),
-                control: base => ({
-                    ...base,
-                    border: "none",
-                    boxShadow: "none",
-                    backgroundColor: "black",
-                    minHeight: "0",
-                    minWidth: "140px",
-                    maxWidth: "240px",
-                    height: "32px",
-                }),
-                menu: base => ({
-                    ...base,
-                    backgroundColor: "black",
-                    width: "auto",
-                    marginTop: "4px",
-                }),
-                option: (base, state) => ({
-                    ...base,
-                    backgroundColor: state.isFocused ? "#1a1a1a" : "black",
-                    color: "white",
-                }),
-            }}
-        />
-          
-        </div>
-          
-        <div>
-          <button 
-            onClick={() => updateDays(selectedOption ? selectedOption.value : "", selectedDate, countValue)}
-            className='my-4 bg-black text-zinc-100 border-zinc-900 border-2 px-4 py-1 rounded'
-          >
-            submit 
-          </button>
-        </div>
-          
-          <CalendarHeatmap
-            horizontal={screenWidth > 786 || screenWidth == 0}
-            startDate={new Date('2025-01-01')}
-            endDate={new Date('2025-12-31')}
-            values={selectedOption ? days[selectedOption.value] || [] : []}
-            onClick={(value) => { 
-              if (value) {
-                alert(`Date: ${value.date}, Count: ${value.count}`);
-              }
-            }}
-            classForValue={(value) => {
-              if (!value || value.count === 0) return 'color-empty';
-
-              const range = selectedMaxValue - selectedMinValue;
-              if (range <= 0) return value.count > 0 ? 'color-scale-1' : 'color-scale-10';
-
-              const normalized = (value.count - selectedMinValue) / range;
-              const idx = Math.min(10, Math.max(1, Math.ceil(normalized * 10)));
-
-              return `color-scale-${idx}`;
-            }}
-          />
+            <HeatMap 
+                screenWidth={screenWidth} 
+                selectedOption={selectedOption}
+                days={days}
+                selectedMinValue={selectedMinValue}
+                selectedMaxValue={selectedMaxValue}
+                >
+            </HeatMap>
         </div>
       </main>
     </div>
