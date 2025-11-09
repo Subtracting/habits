@@ -60,7 +60,7 @@ export default function DeletePopup({
 
                 <Button
                   className='m-4 bg-black hover:bg-zinc-950 text-zinc-100 hover:text-zinc-100 border-zinc-900 hover:border-zinc-700 border-2 px-4 py-1 rounded'
-                  onClick={deleteSelectedOption}
+                  onClick={close}
                 >
                  Cancel 
                 </Button>
