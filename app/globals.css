@@ -25,6 +25,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.heat-scroll {
+  overflow-x: scroll;
+}
+
 .react-calendar-heatmap svg {
   background-color: transparent;
 }
@@ -47,6 +51,14 @@ body {
 .react-calendar-heatmap .color-scale-9 { fill: #c6e48b; }
 .react-calendar-heatmap .color-scale-10 { fill: #d6e685; }
 
+.react-calendar-heatmap .color-today { fill: red; }
+
+.react-calendar-heatmap rect[data-date="${today}"] {
+    stroke: #222;
+    stroke-width: 2px;
+    rx: 3px;
+}
+
 .react-calendar-heatmap text {
   fill: #8b949e;
   font-size: 10px;
@@ -61,6 +73,7 @@ body {
     width: 100%;
     max-width: 900px;
     display: block;
+    overflow-x: scroll;
 }
 
 input[type="number"] {

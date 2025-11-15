@@ -22,9 +22,10 @@ export default function HeatMap({
     selectedMinValue,
     selectedMaxValue,
     }: HeatMapProps) {
+
     return (
           <CalendarHeatmap
-            horizontal={screenWidth > 786 || screenWidth == 0}
+            horizontal={true} /*{screenWidth > 786 || screenWidth == 0}*/
             startDate={new Date('2025-01-01')}
             endDate={new Date('2025-12-31')}
             values={selectedOption ? days[selectedOption.value] || [] : []}
@@ -34,7 +35,7 @@ export default function HeatMap({
               }
             }}
             classForValue={(value) => {
-              if (!value || value.count === 0) return 'color-empty';
+              if (!value) return 'color-empty';
 
               const range = selectedMaxValue - selectedMinValue;
               if (range <= 0) return value.count > 0 ? 'color-scale-1' : 'color-scale-10';
