@@ -14,11 +14,14 @@ type RadarChartProps = {
 
 export default function RadarChartSimple({months, selectedOption}: RadarChartProps) {
   return (
-    <div className="rounded-lg w-80 p-8">
+    <div className="rounded-lg w-md p-4">
 
-      <div className="mx-auto aspect-square max-h-[250px] w-full">
+      <div className="mx-auto aspect-square">
         <ResponsiveContainer>
-          <RadarChart height={800} data={months ? months[selectedOption ? selectedOption.value: ""] : []}>
+          <RadarChart 
+            margin={{ left: 40, right: 20, top: 20, bottom: 20 }} 
+            height={800} 
+            data={months ? months[selectedOption ? selectedOption.value: ""] : []}>
             <defs>
               <linearGradient id="countGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#9be9a8" stopOpacity={0.9} />
@@ -30,7 +33,7 @@ export default function RadarChartSimple({months, selectedOption}: RadarChartPro
               contentStyle={{ backgroundColor:"black" }}
             />
             <PolarGrid stroke="#fff" opacity={0.1}/>
-            <PolarAngleAxis dataKey="month" />
+            <PolarAngleAxis tick={{ fontSize: 13 }} dataKey="month" />
             <Radar
               dataKey="count"
               stroke="#9be9a8"
