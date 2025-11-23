@@ -5,6 +5,8 @@ import 'react-calendar-heatmap/dist/styles.css';
 
 import type { Option } from '@/types/option.types';
 import type { DaysState } from '@/types/days.types';
+import InfoPopup from './InfoPopup';
+import { useState } from 'react';
 
 type HeatMapProps = {
   screenWidth: number
@@ -23,15 +25,36 @@ export default function HeatMap({
     selectedMaxValue,
     }: HeatMapProps) {
 
+    const [infoPopupData, setInfoPopupData] = useState<{date: string, count: number}>({date: "", count: 0});
+    const [tooltip, setTooltip] = useState({ show: false, x: 0, y:0, content: null });
+
+    const handleMouseOver = (event, value) => {
+      if (value && value.count !== undefined) {
+        setTooltip({
+          show: true,
+          x: event.clientX,
+          y: event.clientY,
+          content: value
+        });
+      }
+    };
+  
+    const handleMouseLeave = () => {
+      setTooltip({ show: false, x: 0, y: 0, content: null });
+    };
+
     return (
+        <>
           <CalendarHeatmap
-            horizontal={true} /*{screenWidth > 786 || screenWidth == 0}*/
+            horizontal={screenWidth > 786 || screenWidth == 0}
             startDate={new Date('2025-01-01')}
             endDate={new Date('2025-12-31')}
             values={selectedOption ? days[selectedOption.value] || [] : []}
+            onMouseOver={handleMouseOver}
+            onMouseLeave={handleMouseLeave}
             onClick={(value) => { 
               if (value) {
-                alert(`Date: ${value.date}, Count: ${value.count}`);
+                  setInfoPopupData({ date: value.date, count: value.count });
               }
             }}
             classForValue={(value) => {
@@ -46,5 +69,14 @@ export default function HeatMap({
               return `color-scale-${idx}`;
             }}
           />
+
+          {infoPopupData.date !== "" && (
+              <InfoPopup
+                infoDate={infoPopupData.date}
+                infoCount={infoPopupData.count}
+                onClose={() => setInfoPopupData({date: "", count: 0})}
+              />
+          )}
+      </>
   )
 }

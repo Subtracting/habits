@@ -1,18 +1,16 @@
 "use client"
 
-import { MonthState } from "@/types/months.types"
+import { MonthData } from "@/types/months.types" 
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, 
   Tooltip, ResponsiveContainer,
 } from "recharts"
-import type { Option } from "@/types/option.types"
 
 type RadarChartProps = {
-  months: MonthState
-  selectedOption: Option | null
+  months: MonthData[] 
 }
 
-export default function RadarChartSimple({months, selectedOption}: RadarChartProps) {
+export default function RadarChartSimple({ months }: RadarChartProps) {
   return (
     <div className="rounded-lg w-md p-4">
 
@@ -20,8 +18,9 @@ export default function RadarChartSimple({months, selectedOption}: RadarChartPro
         <ResponsiveContainer>
           <RadarChart 
             margin={{ left: 40, right: 20, top: 20, bottom: 20 }} 
-            height={800} 
-            data={months ? months[selectedOption ? selectedOption.value: ""] : []}>
+            height={500} 
+            data={months}
+          >
             <defs>
               <linearGradient id="countGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#9be9a8" stopOpacity={0.9} />
@@ -47,4 +46,3 @@ export default function RadarChartSimple({months, selectedOption}: RadarChartPro
     </div>
   )
 }
-
