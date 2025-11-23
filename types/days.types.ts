@@ -2,7 +2,7 @@ export interface DayData {
     date: string;
     year: number;
     month: string;
-    weekday: string;
+    weekday: number;
     count: number;
 }
 

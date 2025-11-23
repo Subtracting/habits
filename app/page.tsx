@@ -83,10 +83,9 @@ const calculateWeekDays = (habitDays: DayData[]): WeekDaysData[] => {
     if (!habitDays) return weekDaysData;
 
     habitDays.forEach((dayData) => {
-        const weekDayIndex = allWeekDays.indexOf(dayData.weekday);
-        if (weekDayIndex >= 0) {
-            weekDaysData[weekDayIndex].count += dayData.count;
-        }
+        const weekDayIndex = dayData.weekday;
+        console.log(weekDayIndex, dayData.weekday);
+        weekDaysData[weekDayIndex].count += dayData.count;
     });
 
     return weekDaysData;
@@ -154,7 +153,7 @@ export default function Home() {
       
       const year = dateToUpdate.getFullYear();
       const month = allMonths[dateToUpdate.getMonth()];
-      const weekday = allWeekDays[(dateToUpdate.getDay() + 6) % allWeekDays.length];
+      const weekday = (dateToUpdate.getDay() + 6) % allWeekDays.length;
 
       const existingIndex = habitDays.findIndex((d) => d.date === dateStr);
       
