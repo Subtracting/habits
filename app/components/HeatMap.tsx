@@ -26,22 +26,6 @@ export default function HeatMap({
     }: HeatMapProps) {
 
     const [infoPopupData, setInfoPopupData] = useState<{date: string, count: number}>({date: "", count: 0});
-    const [tooltip, setTooltip] = useState({ show: false, x: 0, y:0, content: null });
-
-    const handleMouseOver = (event, value) => {
-      if (value && value.count !== undefined) {
-        setTooltip({
-          show: true,
-          x: event.clientX,
-          y: event.clientY,
-          content: value
-        });
-      }
-    };
-  
-    const handleMouseLeave = () => {
-      setTooltip({ show: false, x: 0, y: 0, content: null });
-    };
 
     return (
         <>
@@ -50,8 +34,6 @@ export default function HeatMap({
             startDate={new Date('2025-01-01')}
             endDate={new Date('2025-12-31')}
             values={selectedOption ? days[selectedOption.value] || [] : []}
-            onMouseOver={handleMouseOver}
-            onMouseLeave={handleMouseLeave}
             onClick={(value) => { 
               if (value) {
                   setInfoPopupData({ date: value.date, count: value.count });
