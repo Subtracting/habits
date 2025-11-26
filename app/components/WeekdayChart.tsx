@@ -41,7 +41,6 @@ const CustomBarShape = (props: CustomBarShapeProps) => {
 
 export default function WeekdayChart({ weekdays }: WeekdayChartProps) {
   const rankedWeekdays = assignRanks(weekdays);
-  console.log(weekdays);
   
   return (
     <BarChart

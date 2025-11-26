@@ -9,10 +9,17 @@ import DeletePopup from './components/DeletePopup';
 import HabitRadarChart from './components/HabitRadarChart';
 import WeekdayChart from './components/WeekdayChart';
 
+import { allMonths, 
+         allWeekDays, 
+         toLocalDateString, 
+         computeMinMax, 
+         calculateMonths, 
+         calculateWeekDays, 
+         calculateHabitStats } from './utils/habitCalculations';
+
+import type { StatsState } from '@/types/stats.types';
 import type { Option } from '@/types/option.types';
 import type { DaysState, DayData } from '@/types/days.types';
-import type { WeekDaysData } from '@/types/weekdays.types';
-import type { MonthData } from '@/types/months.types';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './datepicker-dark.css';
@@ -28,69 +35,6 @@ const defaultOptions = [
   createOption("pages"),
 ];
 
-const allMonths = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
-
-const allWeekDays = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-];
-
-/* helper functions */
-const toLocalDateString = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-const computeMinMax = (data: DayData[]) => {
-  if (!data || data.length === 0) {
-    return { minValue: 0, maxValue: 0 };
-  }
-  const counts = data.map((item) => item.count);
-  return {
-    minValue: Math.min(...counts),
-    maxValue: Math.max(...counts),
-  };
-};
-
-const calculateMonths = (habitDays: DayData[]): MonthData[] => {
-  const monthData: MonthData[] = allMonths.map((month) => ({
-    month,
-    count: 0,
-  }));
-
-  if (!habitDays) return monthData;
-
-  habitDays.forEach((dayData) => {
-    const monthIndex = allMonths.indexOf(dayData.month);
-    if (monthIndex >= 0) {
-      monthData[monthIndex].count += dayData.count;
-    }
-  });
-
-  return monthData;
-};
-
-const calculateWeekDays = (habitDays: DayData[]): WeekDaysData[] => {
-    const weekDaysData: WeekDaysData[] = allWeekDays.map((weekday) => ({
-        weekday,
-        count: 0,
-    }));
-
-    if (!habitDays) return weekDaysData;
-
-    habitDays.forEach((dayData) => {
-        const weekDayIndex = dayData.weekday;
-        console.log(weekDayIndex, dayData.weekday);
-        weekDaysData[weekDayIndex].count += dayData.count;
-    });
-
-    return weekDaysData;
-};
-
 export default function Home() {
   const [options, setOptions] = useState<Option[]>(defaultOptions);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
@@ -98,6 +42,10 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [days, setDays] = useState<DaysState>({});
   const [screenWidth, setScreenWidth] = useState<number>(0);
+
+  const [stats, setStats] = useState<StatsState>({});
+
+  const selectedOptionValue = selectedOption ? selectedOption.value : "";
 
   /* initial habits-data load */
   useEffect(() => {
@@ -121,26 +69,44 @@ export default function Home() {
     const handleResize = () => setScreenWidth(window.innerWidth);
     handleResize(); 
     window.addEventListener('resize', handleResize);
-    
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  /* calculations */
-  const selectedOptionValue = selectedOption ? selectedOption.value : "";
+  useEffect(() => {
+      const daysDataForOption = days[selectedOptionValue];
+      
+      if (daysDataForOption) {
+          const newStats = calculateHabitStats(daysDataForOption);
+          setStats(prevStats => ({
+              ...prevStats,
+              [selectedOptionValue]: newStats,
+          }));
+      } else if (selectedOptionValue && days[selectedOptionValue] === undefined) {
+          setStats(prevStats => {
+              const updatedStats = { ...prevStats };
+              delete updatedStats[selectedOptionValue];
+              return updatedStats;
+          });
+      }
+  }, [days, selectedOptionValue]); 
 
-  const { minValue, maxValue } = useMemo(() => {
-    const data = days[selectedOptionValue] || [];
-    return computeMinMax(data);
+  const currentStats = stats[selectedOptionValue];
+
+  /* calculations */
+      const { minValue, maxValue } = useMemo(() => {
+      const data = days[selectedOptionValue] || [];
+      return computeMinMax(data);
   }, [days, selectedOptionValue]);
 
   const monthsData = useMemo(() => {
-    const data = days[selectedOptionValue] || [];
-    return calculateMonths(data);
+      const data = days[selectedOptionValue] || [];
+      return calculateMonths(data);
   }, [days, selectedOptionValue]);
 
   const weekdaysData = useMemo(() => {
-    const data = days[selectedOptionValue] || [];
-    return calculateWeekDays(data);
+      const data = days[selectedOptionValue] || [];
+      return calculateWeekDays(data);
   }, [days, selectedOptionValue]);
 
   /* update habits-data with new date */
@@ -195,47 +161,92 @@ export default function Home() {
       <main className="flex min-h-screen w-full flex-col py-16 px-16 text-white bg-black sm:items-start">
         <h1 className="text-6xl">habits.</h1>
 
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date: Date | null) => date && setSelectedDate(date)}
-          className="bg-zinc-950 text-white rounded-md px-4 py-2 my-4"
-          calendarClassName="react-datepicker"
-        />
 
         <div className="cal-container">
-          <InputSelect
-            countValue={countValue}
-            setCountValue={setCountValue}
-            handleSelectUpdate={handleSelectUpdate}
-            handleCreate={handleCreate}
-            options={options}
-            selectedOption={selectedOption}
-          />
+          <div className='flex justify-between'>
+            <div>
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date: Date | null) => date && setSelectedDate(date)}
+                className="bg-zinc-950 text-white rounded-md px-4 py-2 my-4"
+                calendarClassName="react-datepicker"
+              />
+              <InputSelect
+                countValue={countValue}
+                setCountValue={setCountValue}
+                handleSelectUpdate={handleSelectUpdate}
+                handleCreate={handleCreate}
+                options={options}
+                selectedOption={selectedOption}
+              />
 
-          <div>
-            <button
-              onClick={() => updateDays(selectedDate, countValue)}
-              className="
-                my-4 
-                bg-black 
-                hover:bg-zinc-950 
-                text-zinc-100 
-                hover:text-zinc-100 
-                border-zinc-900 
-                hover:border-zinc-700 
-                border-2 
-                px-4 
-                py-1 
-                rounded"
-            >
-              submit
-            </button>
-            <DeletePopup
-              setDays={setDays}
-              selectedOptionValue={selectedOptionValue}
-            />
+              <div>
+                <button
+                  onClick={() => updateDays(selectedDate, countValue)}
+                  className="
+                    my-4 
+                    bg-black 
+                    hover:bg-zinc-950 
+                    text-zinc-100 
+                    hover:text-zinc-100 
+                    border-zinc-900 
+                    hover:border-zinc-700 
+                    border-2 
+                    px-4 
+                    py-1 
+                    rounded"
+                >
+                  submit
+                </button>
+                <DeletePopup
+                  setDays={setDays}
+                  selectedOptionValue={selectedOptionValue}
+                />
+              </div>
+              </div>
+
+
+              {currentStats ? (
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th align='left'>Statistic</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Total Count</td>
+                                <td>{currentStats.total}</td>
+                            </tr>
+                            <tr>
+                                <td>Max Daily Count&nbsp;</td>
+                                <td>{currentStats.max}</td>
+                            </tr>
+                            <tr>
+                                <td>Min Daily Count</td>
+                                <td>{currentStats.min}</td>
+                            </tr>
+                            <tr>
+                                <td>Current Streak</td>
+                                <td>{currentStats.streak}</td>
+                            </tr>
+                            <tr>
+                                <td>7-Day Total</td>
+                                <td>{currentStats.weekTotal}</td>
+                            </tr>
+                            <tr>
+                                <td>Month Total</td>
+                                <td>{currentStats.monthTotal}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <p>Select a habit to view statistics.</p>
+            )}
           </div>
-
           <HeatMap
             screenWidth={screenWidth}
             selectedOption={selectedOption}
@@ -244,6 +255,7 @@ export default function Home() {
             selectedMaxValue={maxValue}
           />
         </div>
+
         <div className="flex justify-around space-x-4">
             <WeekdayChart 
                 weekdays={weekdaysData}
