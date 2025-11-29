@@ -23,6 +23,7 @@ import type { DaysState, DayData } from '@/types/days.types';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './datepicker-dark.css';
+import SimpleLineChart from './components/LineChart';
 
 const createOption = (label: string): Option => ({
   label,
@@ -99,11 +100,6 @@ export default function Home() {
       return computeMinMax(data);
   }, [days, selectedOptionValue]);
 
-  const monthsData = useMemo(() => {
-      const data = days[selectedOptionValue] || [];
-      return calculateMonths(data);
-  }, [days, selectedOptionValue]);
-
   const weekdaysData = useMemo(() => {
       const data = days[selectedOptionValue] || [];
       return calculateWeekDays(data);
@@ -158,12 +154,12 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center font-mono bg-black">
-      <main className="flex min-h-screen w-full flex-col py-16 px-16 text-white bg-black sm:items-start">
+      <main className="flex min-h-screen flex-col py-16 px-16  text-white bg-black sm:items-start">
         <h1 className="text-6xl">habits.</h1>
 
 
         <div className="cal-container">
-          <div className='flex justify-between'>
+          <div className='flex justify-between py-4'>
             <div>
               <DatePicker
                 selected={selectedDate}
@@ -171,16 +167,16 @@ export default function Home() {
                 className="bg-zinc-950 text-white rounded-md px-4 py-2 my-4"
                 calendarClassName="react-datepicker"
               />
-              <InputSelect
-                countValue={countValue}
-                setCountValue={setCountValue}
-                handleSelectUpdate={handleSelectUpdate}
-                handleCreate={handleCreate}
-                options={options}
-                selectedOption={selectedOption}
-              />
+                <InputSelect
+                    countValue={countValue}
+                    setCountValue={setCountValue}
+                    handleSelectUpdate={handleSelectUpdate}
+                    handleCreate={handleCreate}
+                    options={options}
+                    selectedOption={selectedOption}
+                />
 
-              <div>
+              <div className='flex'>
                 <button
                   onClick={() => updateDays(selectedDate, countValue)}
                   className="
@@ -203,7 +199,7 @@ export default function Home() {
                   selectedOptionValue={selectedOptionValue}
                 />
               </div>
-              </div>
+             </div>
 
 
               {currentStats ? (
@@ -256,14 +252,11 @@ export default function Home() {
           />
         </div>
 
-        <div className="flex justify-around space-x-4">
+        <div className="flex justify-around h-[400px] space-x-4">
             <WeekdayChart 
                 weekdays={weekdaysData}
             />
-            
-            <HabitRadarChart 
-                months={monthsData}
-            />
+            <SimpleLineChart days={days[selectedOptionValue]}/>
         </div>
       </main>
     </div>

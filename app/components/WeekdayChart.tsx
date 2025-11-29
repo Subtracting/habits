@@ -44,15 +44,17 @@ export default function WeekdayChart({ weekdays }: WeekdayChartProps) {
   
   return (
     <BarChart
-      style={{ width: '50%', maxWidth: '500px', aspectRatio: 1.618 }}
+      style={{ width: '400px', height: '400px', aspectRatio: 1.618 }}
       responsive
       data={rankedWeekdays}
-      margin={{ top: 25, right: 25, left: 0, bottom: 25 }}
+      margin={{ top: 25, right: 25, left: 0, bottom: 0 }}
     >
-      <XAxis dataKey="weekday" fontSize={12} />
+      <XAxis dataKey="weekday" fontSize={14} interval={0}/> 
       <Tooltip 
         cursor={false} 
         contentStyle={{ backgroundColor: "black" }} 
+        itemStyle={{ color: "white" }}
+        labelStyle={{ color: "grey" }}
         formatter={(value: number) => [`Count: ${value}`]}
       />
       <Bar 

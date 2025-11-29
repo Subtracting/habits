@@ -9,7 +9,7 @@ export const allMonths = [
 ];
 
 export const allWeekDays = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+    'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'
 ];
 
 export const toLocalDateString = (date: Date) => {
