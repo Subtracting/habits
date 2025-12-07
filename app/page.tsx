@@ -22,7 +22,7 @@ import type { DaysState, DayData } from '@/types/days.types';
 import 'react-datepicker/dist/react-datepicker.css';
 import './datepicker-dark.css';
 import SimpleLineChart from './components/LineChart';
-import { GoalState } from '@/types/goal.types';
+// import { GoalState } from '@/types/goal.types';
 
 const createOption = (label: string): Option => ({
   label,
@@ -44,7 +44,6 @@ export default function Home() {
   const [screenWidth, setScreenWidth] = useState<number>(0);
 
   const [stats, setStats] = useState<StatsState>({});
-  const [goal, setGoal] = useState<GoalState>({"pages": 1000});
 
   const selectedOptionValue = selectedOption ? selectedOption.value : "";
 
