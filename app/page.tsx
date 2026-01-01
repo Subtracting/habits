@@ -22,7 +22,6 @@ import { allMonths,
     import 'react-datepicker/dist/react-datepicker.css';
     import './datepicker-dark.css';
     import SimpleLineChart from './components/LineChart';
-import YearSelect from './components/YearSelect';
     // import { GoalState } from '@/types/goal.types';
 
     const createOption = (label: string): Option => ({
