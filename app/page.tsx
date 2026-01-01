@@ -9,147 +9,149 @@ import DeletePopup from './components/DeletePopup';
 import WeekdayChart from './components/WeekdayChart';
 
 import { allMonths, 
-         allWeekDays, 
-         toLocalDateString, 
-         computeMinMax, 
-         calculateWeekDays, 
-         calculateHabitStats } from './utils/habitCalculations';
+    allWeekDays, 
+    toLocalDateString, 
+    computeMinMax, 
+    calculateWeekDays, 
+    calculateHabitStats } from './utils/habitCalculations';
 
-import type { StatsState } from '@/types/stats.types';
-import type { Option } from '@/types/option.types';
-import type { DaysState, DayData } from '@/types/days.types';
+    import type { StatsState } from '@/types/stats.types';
+    import type { Option } from '@/types/option.types';
+    import type { DaysState, DayData } from '@/types/days.types';
 
-import 'react-datepicker/dist/react-datepicker.css';
-import './datepicker-dark.css';
-import SimpleLineChart from './components/LineChart';
-// import { GoalState } from '@/types/goal.types';
+    import 'react-datepicker/dist/react-datepicker.css';
+    import './datepicker-dark.css';
+    import SimpleLineChart from './components/LineChart';
+import YearSelect from './components/YearSelect';
+    // import { GoalState } from '@/types/goal.types';
 
-const createOption = (label: string): Option => ({
-  label,
-  value: label.toLowerCase().replace(/\W/g, ''),
-});
-
-const defaultOptions = [
-  createOption("movies"),
-  createOption("books"),
-  createOption("pages"),
-];
-
-export default function Home() {
-  const [options, setOptions] = useState<Option[]>(defaultOptions);
-  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
-  const [countValue, setCountValue] = useState<number>(1);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [days, setDays] = useState<DaysState>({});
-  const [screenWidth, setScreenWidth] = useState<number>(0);
-
-  const [stats, setStats] = useState<StatsState>({});
-
-  const selectedOptionValue = selectedOption ? selectedOption.value : "";
-
-  /* initial habits-data load */
-  useEffect(() => {
-    const savedDays = localStorage.getItem('habits-data');
-    if (savedDays) {
-      const parsed: DaysState = JSON.parse(savedDays);
-      setDays(parsed);
-      
-      const savedOptions = Object.keys(parsed).map((key) => createOption(key));
-      setOptions((prev) => {
-        const all = [...prev];
-        savedOptions.forEach((opt) => {
-          if (!all.some((o) => o.value === opt.value)) {
-            all.push(opt);
-          }
-        });
-        return all;
-      });
-    }
-
-    const handleResize = () => setScreenWidth(window.innerWidth);
-    handleResize(); 
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-      const daysDataForOption = days[selectedOptionValue];
-      
-      if (daysDataForOption) {
-          const newStats = calculateHabitStats(daysDataForOption);
-          setStats(prevStats => ({
-              ...prevStats,
-              [selectedOptionValue]: newStats,
-          }));
-      } else if (selectedOptionValue && days[selectedOptionValue] === undefined) {
-          setStats(prevStats => {
-              const updatedStats = { ...prevStats };
-              delete updatedStats[selectedOptionValue];
-              return updatedStats;
-          });
-      }
-  }, [days, selectedOptionValue]); 
-
-  const currentStats = stats[selectedOptionValue];
-
-  /* calculations */
-      const { minValue, maxValue } = useMemo(() => {
-      const data = days[selectedOptionValue] || [];
-      return computeMinMax(data);
-  }, [days, selectedOptionValue]);
-
-  const weekdaysData = useMemo(() => {
-      const data = days[selectedOptionValue] || [];
-      return calculateWeekDays(data);
-  }, [days, selectedOptionValue]);
-
-  /* update habits-data with new date */
-  const updateDays = (dateToUpdate: Date, count: number) => {
-    if (!selectedOptionValue) return;
-
-    setDays((prev) => {
-      const habitDays = prev[selectedOptionValue] || [];
-      const dateStr = toLocalDateString(dateToUpdate);
-      
-      const year = dateToUpdate.getFullYear();
-      const month = allMonths[dateToUpdate.getMonth()];
-      const weekday = (dateToUpdate.getDay() + 6) % allWeekDays.length;
-
-      const existingIndex = habitDays.findIndex((d) => d.date === dateStr);
-      
-      let updatedList: DayData[];
-
-      if (existingIndex >= 0) {
-        updatedList = habitDays.map((d, i) =>
-          i === existingIndex
-            ? { ...d, year, month, weekday, count: d.count + count }
-            : d
-        );
-      } else {
-        updatedList = [
-          ...habitDays,
-          { date: dateStr, year, month, weekday, count: count },
-        ];
-      }
-
-      const newDaysState = { ...prev, [selectedOptionValue]: updatedList };
-      localStorage.setItem('habits-data', JSON.stringify(newDaysState));
-      
-      return newDaysState;
+    const createOption = (label: string): Option => ({
+        label,
+        value: label.toLowerCase().replace(/\W/g, ''),
     });
-  };
 
-  /* handlers */
-  const handleCreate = (inputValue: string) => {
-    const newOption = createOption(inputValue);
-    setOptions((prev) => [...prev, newOption]);
-    setSelectedOption(newOption);
-  };
+    const defaultOptions = [
+        createOption("movies"),
+        createOption("books"),
+        createOption("pages"),
+    ];
 
-  const handleSelectUpdate = (newSelectedOption: Option | null) => {
-    setSelectedOption(newSelectedOption);
-  };
+    export default function Home() {
+        const [options, setOptions] = useState<Option[]>(defaultOptions);
+        const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+        const [countValue, setCountValue] = useState<number>(1);
+        const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+        const [days, setDays] = useState<DaysState>({});
+        const [selectedYear, setSelectedYear] = useState<number>(2026);
+        const [screenWidth, setScreenWidth] = useState<number>(0);
+
+        const [stats, setStats] = useState<StatsState>({});
+
+        const selectedOptionValue = selectedOption ? selectedOption.value : "";
+
+        /* initial habits-data load */
+        useEffect(() => {
+            const savedDays = localStorage.getItem('habits-data');
+            if (savedDays) {
+                const parsed: DaysState = JSON.parse(savedDays);
+                setDays(parsed);
+
+                const savedOptions = Object.keys(parsed).map((key) => createOption(key));
+                setOptions((prev) => {
+                    const all = [...prev];
+                    savedOptions.forEach((opt) => {
+                        if (!all.some((o) => o.value === opt.value)) {
+                            all.push(opt);
+                        }
+                    });
+                    return all;
+                });
+            }
+
+            const handleResize = () => setScreenWidth(window.innerWidth);
+            handleResize(); 
+            window.addEventListener('resize', handleResize);
+
+            return () => window.removeEventListener('resize', handleResize);
+        }, []);
+
+        useEffect(() => {
+            const daysDataForOption = days[selectedOptionValue];
+
+            if (daysDataForOption) {
+                const newStats = calculateHabitStats(daysDataForOption);
+                setStats(prevStats => ({
+                    ...prevStats,
+                    [selectedOptionValue]: newStats,
+                }));
+            } else if (selectedOptionValue && days[selectedOptionValue] === undefined) {
+                setStats(prevStats => {
+                    const updatedStats = { ...prevStats };
+                    delete updatedStats[selectedOptionValue];
+                    return updatedStats;
+                });
+            }
+        }, [days, selectedOptionValue]); 
+
+        const currentStats = stats[selectedOptionValue];
+
+        /* calculations */
+        const { minValue, maxValue } = useMemo(() => {
+            const data = days[selectedOptionValue] || [];
+            return computeMinMax(data);
+        }, [days, selectedOptionValue]);
+
+        const weekdaysData = useMemo(() => {
+            const data = days[selectedOptionValue] || [];
+            return calculateWeekDays(data);
+        }, [days, selectedOptionValue]);
+
+        /* update habits-data with new date */
+        const updateDays = (dateToUpdate: Date, count: number) => {
+            if (!selectedOptionValue) return;
+
+            setDays((prev) => {
+                const habitDays = prev[selectedOptionValue] || [];
+                const dateStr = toLocalDateString(dateToUpdate);
+
+                const year = dateToUpdate.getFullYear();
+                const month = allMonths[dateToUpdate.getMonth()];
+                const weekday = (dateToUpdate.getDay() + 6) % allWeekDays.length;
+
+                const existingIndex = habitDays.findIndex((d) => d.date === dateStr);
+
+                let updatedList: DayData[];
+
+                if (existingIndex >= 0) {
+                    updatedList = habitDays.map((d, i) =>
+                                                i === existingIndex
+                                                    ? { ...d, year, month, weekday, count: d.count + count }
+                                                    : d
+                                               );
+                } else {
+                    updatedList = [
+                        ...habitDays,
+                        { date: dateStr, year, month, weekday, count: count },
+                    ];
+                }
+
+                const newDaysState = { ...prev, [selectedOptionValue]: updatedList };
+                localStorage.setItem('habits-data', JSON.stringify(newDaysState));
+
+                return newDaysState;
+            });
+        };
+
+        /* handlers */
+            const handleCreate = (inputValue: string) => {
+            const newOption = createOption(inputValue);
+            setOptions((prev) => [...prev, newOption]);
+            setSelectedOption(newOption);
+        };
+
+        const handleSelectUpdate = (newSelectedOption: Option | null) => {
+            setSelectedOption(newSelectedOption);
+        };
 
   return (
     <div className="flex min-h-screen items-center justify-center font-mono bg-black">
@@ -242,13 +244,16 @@ export default function Home() {
                 <p>Select a habit to view statistics.</p>
             )}
           </div>
-          <HeatMap
-            screenWidth={screenWidth}
-            selectedOption={selectedOption}
-            days={days}
-            selectedMinValue={minValue}
-            selectedMaxValue={maxValue}
-          />
+        <div className="relative">
+              <HeatMap
+                screenWidth={screenWidth}
+                selectedOption={selectedOption}
+                days={days}
+                selectedYear={selectedDate.getFullYear()}
+                selectedMinValue={minValue}
+                selectedMaxValue={maxValue}
+              />
+            </div>
         </div>
 
         <div className="flex justify-around h-[400px] space-x-4">

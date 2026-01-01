@@ -12,6 +12,7 @@ type HeatMapProps = {
   screenWidth: number
   selectedOption: Option | null
   days: DaysState
+  selectedYear: number
   selectedMinValue: number
   selectedMaxValue: number
 }
@@ -21,6 +22,7 @@ export default function HeatMap({
     screenWidth,
     selectedOption,
     days,
+    selectedYear,
     selectedMinValue,
     selectedMaxValue,
     }: HeatMapProps) {
@@ -31,8 +33,8 @@ export default function HeatMap({
         <>
           <CalendarHeatmap
             horizontal={screenWidth > 786 || screenWidth == 0}
-            startDate={new Date('2025-01-01')}
-            endDate={new Date('2025-12-31')}
+            startDate={new Date(`${selectedYear}-01-01`)}
+            endDate={new Date(`${selectedYear}-12-31`)}
             values={selectedOption ? days[selectedOption.value] || [] : []}
             onClick={(value) => { 
               if (value) {

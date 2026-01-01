@@ -24,7 +24,7 @@ export default function SimpleLineChart({ days }: LineChartProps) {
       <LineChart 
             style={{ width: '400px', height: '400px', aspectRatio: 1.618 }}
             responsive
-            margin={{ left: 40, right: 40, top: 0, bottom: 0 }} 
+            margin={{ left: 40, right: 40, top: 40, bottom: 0 }} 
             height={500} 
             data={sortedData}
           >
