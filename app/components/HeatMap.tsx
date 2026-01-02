@@ -33,8 +33,8 @@ export default function HeatMap({
         <>
           <CalendarHeatmap
             horizontal={screenWidth > 786 || screenWidth == 0}
-            startDate={new Date(`${selectedYear}-01-01`)}
-            endDate={new Date(`${selectedYear}-12-31`)}
+            startDate={`${selectedYear-1}-12-31`}
+            endDate={`${selectedYear}-12-31`}
             values={selectedOption ? days[selectedOption.value] || [] : []}
             onClick={(value) => { 
               if (value) {

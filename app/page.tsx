@@ -22,7 +22,6 @@ import { allMonths,
     import 'react-datepicker/dist/react-datepicker.css';
     import './datepicker-dark.css';
     import SimpleLineChart from './components/LineChart';
-    // import { GoalState } from '@/types/goal.types';
 
     const createOption = (label: string): Option => ({
         label,
@@ -41,7 +40,6 @@ import { allMonths,
         const [countValue, setCountValue] = useState<number>(1);
         const [selectedDate, setSelectedDate] = useState<Date>(new Date());
         const [days, setDays] = useState<DaysState>({});
-        const [selectedYear, setSelectedYear] = useState<number>(2026);
         const [screenWidth, setScreenWidth] = useState<number>(0);
 
         const [stats, setStats] = useState<StatsState>({});
@@ -142,7 +140,7 @@ import { allMonths,
         };
 
         /* handlers */
-            const handleCreate = (inputValue: string) => {
+        const handleCreate = (inputValue: string) => {
             const newOption = createOption(inputValue);
             setOptions((prev) => [...prev, newOption]);
             setSelectedOption(newOption);
