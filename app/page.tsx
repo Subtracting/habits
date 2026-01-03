@@ -73,7 +73,7 @@ import { allMonths,
         }, []);
 
         useEffect(() => {
-            const daysDataForOption = days[selectedOptionValue];
+            const daysDataForOption = days[selectedOptionValue]?.filter(day => day.year === selectedDate.getFullYear()) ?? [];
 
             if (daysDataForOption) {
                 const newStats = calculateHabitStats(daysDataForOption);
@@ -88,7 +88,7 @@ import { allMonths,
                     return updatedStats;
                 });
             }
-        }, [days, selectedOptionValue]); 
+        }, [days, selectedDate, selectedOptionValue]); 
 
         const currentStats = stats[selectedOptionValue];
 
