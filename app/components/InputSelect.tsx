@@ -25,7 +25,7 @@ export default function InputSelect({
             type='number' 
             value={countValue}
             onChange={(e) => setCountValue(Number(e.target.value))} 
-            className='w-16 my-4 bg-zinc-950 text-zinc-100 bborder-2 px-4 py-1 mr-4 rounded'
+            className='w-16 my-4 bg-zinc-950 text-zinc-100 px-4 py-1 mr-4 rounded'
             />
 
         <CreatableSelect

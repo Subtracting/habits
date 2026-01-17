@@ -13,7 +13,7 @@ type LogHabitInputProps = {
   options: Option[];
   selectedOption: Option | null;
   selectedDate: Date;
-  updateDays:(dateToUpdate: Date, count: number) => void;
+  updateDays:(dateToUpdate: Date, count: number, selectedOptionValue: string) => void;
   setDays: React.Dispatch<React.SetStateAction<DaysState>>; 
   selectedOptionValue: string;
 };
@@ -51,7 +51,7 @@ export default function LogHabitInput({
 
               <div className='flex'>
                 <button
-                  onClick={() => updateDays(selectedDate, countValue)}
+                  onClick={() => updateDays(selectedDate, countValue, selectedOptionValue)}
                   className="
                     my-4 
                     bg-black 
