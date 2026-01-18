@@ -57,6 +57,6 @@ export function useGoalData(setOptions: React.Dispatch<React.SetStateAction<Opti
         });
     }, []);
 
-    return { goals, setGoals, updateGoals };
+    return { goals, updateGoals };
 }
 

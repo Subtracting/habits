@@ -1,16 +1,19 @@
 import DatePicker from "react-datepicker";
 import { Option } from "@/types/option.types";
-import { GoalsState } from "@/types/goal.types";
 import { useState } from "react";
 
 type LogHabitInputProps = {
   options: Option[];
-  setGoals: React.Dispatch<React.SetStateAction<GoalsState>>; 
+  updateGoals: (yearToUpdate: Date, count: number, selectedOptionValue: string) => void;
+  selectedOptionValue: string;
+  setSelectedOption: (value: Option | null) => void;
 };
 
 export default function LogGoalInput({
-  options,
-  setGoals,
+    options,
+    updateGoals,
+    selectedOptionValue,
+    setSelectedOption,
 }: LogHabitInputProps) {
     const [selectedYear, setSelectedYear] = useState<Date>(new Date(2026, 0, 1));
     const [goalValue, setGoalValue] = useState<number>(1);
@@ -18,8 +21,9 @@ export default function LogGoalInput({
     const renderYearContent = (year: number): React.ReactNode => {
         const tooltipText = `Tooltip for year: ${year}`;
         return <span title={tooltipText}>{year}</span>;
-  };
-  return (
+
+    };
+    return (
     <>
             <div>
               <DatePicker
@@ -31,29 +35,29 @@ export default function LogGoalInput({
                 calendarClassName="react-datepicker"
                 dateFormat="yyyy"
               />
-    <div className='flex'>
-      <input
-        type='number'
-        value={goalValue}
-        onChange={(e) => setGoalValue(Number(e.target.value))}
-        className='w-16 my-4 bg-zinc-950 text-zinc-100 px-4 py-1 mr-4 rounded'
-      />
-    <select
-      className="w-auto my-4 bg-black text-zinc-100 px-4 py-1 rounded"
-      value={goalValue}
-      onChange={(e) => setGoalValue(Number(e.target.value))}
-    >
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-
-    </div>
+              <div className='flex'>
+                <input
+                  type='number'
+                  value={goalValue}
+                  onChange={(e) => setGoalValue(Number(e.target.value))}
+                  className='w-16 my-4 bg-zinc-950 text-zinc-100 px-4 py-1 mr-4 rounded'
+                />
+                <select
+                  className="w-auto my-4 bg-black text-zinc-100 px-4 py-1 rounded"
+                  value={selectedOptionValue}
+                  onChange={(e) => setSelectedOption({label: e.target.value, value: e.target.value})}
+                >
+                  {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <div className='flex'>
                 <button
+                  onClick={() => updateGoals(selectedYear, goalValue, selectedOptionValue)}
                   className="
                     my-4 
                     bg-black 
