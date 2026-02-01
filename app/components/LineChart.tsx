@@ -14,9 +14,13 @@ type LineChartProps = {
 }
 
 export default function SimpleLineChart({ days }: LineChartProps) {
-  const sortedData = [...(days ?? [])].sort((a, b) =>
-          a.date.localeCompare(b.date)
-        );
+  const sortedData = [...(days ?? [])]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(item => ({
+        ...item,
+        date: new Date(item.date).getTime()
+    }));
+
   return (
     <div className="rounded-lg">
 
@@ -28,22 +32,33 @@ export default function SimpleLineChart({ days }: LineChartProps) {
             height={500} 
             data={sortedData}
           >
-      <XAxis dataKey="date" angle={-16}
-          tickFormatter={(value) => {
-            const date = new Date(value);
-            const dd = String(date.getDate()).padStart(2, "0");
-            const mm = String(date.getMonth() + 1).padStart(2, "0");
-            return `${dd}-${mm}`;
-          }}
-      />
-      <YAxis width="auto" />
-      <Tooltip 
-        contentStyle={{ backgroundColor: "black" }} 
-        itemStyle={{ color: "white" }}
-        labelStyle={{ color: "grey" }}
-      />
-      <Line type="monotone" dataKey="count" stroke="#82ca9d" />
-          </LineChart>
+          <XAxis
+              dataKey="date" 
+              angle={-16}
+              type="number"
+              domain={['dataMin', 'dataMax']}
+              tickFormatter={(value) => {
+                const date = new Date(value);
+                const dd = String(date.getDate()).padStart(2, "0");
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                return `${dd}-${mm}`;
+              }}
+          />
+          <YAxis width="auto" />
+            <Tooltip 
+              contentStyle={{ backgroundColor: "black" }} 
+              itemStyle={{ color: "white" }}
+              labelStyle={{ color: "grey" }}
+              labelFormatter={(value) => {
+                const date = new Date(value);
+                const dd = String(date.getDate()).padStart(2, "0");
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const yyyy = date.getFullYear();
+                return `${dd}-${mm}-${yyyy}`;
+              }}
+            />
+          <Line type="monotone" dataKey="count" stroke="#82ca9d" />
+      </LineChart>
       </div>
 
     </div>
