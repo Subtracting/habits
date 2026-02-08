@@ -1,11 +1,13 @@
 import DatePicker from "react-datepicker";
 import { Option } from "@/types/option.types";
 import { useState } from "react";
+import CreatableSelect from "react-select/creatable";
 
 type LogHabitInputProps = {
   options: Option[];
   updateGoals: (yearToUpdate: Date, count: number, selectedOptionValue: string) => void;
   selectedOptionValue: string;
+  selectedOption: Option | null;
   setSelectedOption: (value: Option | null) => void;
 };
 
@@ -13,6 +15,7 @@ export default function LogGoalInput({
     options,
     updateGoals,
     selectedOptionValue,
+    selectedOption,
     setSelectedOption,
 }: LogHabitInputProps) {
     const [selectedYear, setSelectedYear] = useState<Date>(new Date(2026, 0, 1));
@@ -42,17 +45,44 @@ export default function LogGoalInput({
                   onChange={(e) => setGoalValue(Number(e.target.value))}
                   className='w-16 my-4 bg-zinc-950 text-zinc-100 px-4 py-1 mr-4 rounded'
                 />
-                <select
-                  className="w-auto my-4 bg-black text-zinc-100 px-4 py-1 rounded"
-                  value={selectedOptionValue}
-                  onChange={(e) => setSelectedOption({label: e.target.value, value: e.target.value})}
-                >
-                  {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <CreatableSelect
+                    onChange={(newValue) => setSelectedOption(newValue)}
+                    options={options}
+                    value={selectedOption}
+                    placeholder="Select habit..."
+                    className="my-4"
+                    styles={{
+                        input: base => ({
+                            ...base,
+                            color: "white",
+                        }),
+                        singleValue: base => ({
+                            ...base,
+                            color: "white",
+                        }),
+                        control: base => ({
+                            ...base,
+                            border: "none",
+                            boxShadow: "none",
+                            backgroundColor: "black",
+                            minHeight: "0",
+                            minWidth: "140px",
+                            maxWidth: "240px",
+                            height: "32px",
+                        }),
+                        menu: base => ({
+                            ...base,
+                            backgroundColor: "black",
+                            width: "auto",
+                            marginTop: "4px",
+                        }),
+                        option: (base, state) => ({
+                            ...base,
+                            backgroundColor: state.isFocused ? "#1a1a1a" : "black",
+                            color: "white",
+                    }),
+                }}
+                />
               </div>
 
               <div className='flex'>

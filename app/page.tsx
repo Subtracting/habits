@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { User } from '@supabase/supabase-js';
 
 import HeatMap from './components/HeatMap';
 import WeekdayChart from './components/WeekdayChart';
@@ -21,6 +22,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './datepicker-dark.css';
 import { useGoalData } from './hooks/useGoalData';
 import GoalProgressBar from './components/GoalProgressBar';
+import Menu from './components/Menu';
+import Auth from './components/Auth';
 
 const defaultOptions = [
     createOption("movies"),
@@ -33,13 +36,15 @@ export default function Home() {
     const [selectedOption, setSelectedOption] = useState<Option | null>(null);
     const [countValue, setCountValue] = useState<number>(1);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-    const [inputType, setInputType] = useState<string>("habits");
+    const [inputType, setInputType] = useState<'habits' | 'goals'>("habits");
+
+    const [user, setUser] = useState<User | null>(null);
 
     const selectedOptionValue = selectedOption?.value ?? "";
 
     /* custom hooks */
-    const { goals, updateGoals } = useGoalData(setOptions);
-    const { days, setDays, updateDays } = useHabitData(setOptions);
+    const { goals, updateGoals } = useGoalData(user ? user.id : null, setOptions);
+    const { days, setDays, updateDays } = useHabitData(user ? user.id : null, setOptions);
     const stats = useHabitStats(days, selectedOptionValue, selectedDate);
     const { minMax, weekdaysData } = useHabitCalculations(days, selectedOptionValue);
     const screenWidth = useScreenWidth();
@@ -59,9 +64,10 @@ export default function Home() {
         setSelectedOption(newSelectedOption);
     };
 
-    const handleInputTypeSelect = () => {
-        setInputType(inputType === 'habits' ? 'goals' : 'habits');
-    };
+    const handleUserChange = useCallback((newUser: User | null) => {
+    console.log('User changed to:', newUser);
+    setUser(newUser);
+  }, []);
 
     useEffect(() => {
         if (inputType !== displayType) {
@@ -75,19 +81,13 @@ export default function Home() {
 
     return (
     <div className="flex min-h-screen items-center justify-center font-mono bg-black">
+        <Auth onUserChange={handleUserChange} />
       <main className="flex min-h-screen flex-col py-16 px-16 text-white bg-black sm:items-start">
       <div className="flex justify-between items-center w-full">
         <h1 className="text-6xl">{inputType}.</h1>
-       <div className="flex">
-        <button 
-          onClick={handleInputTypeSelect}
-          className="w-10 h-6 bg-zinc-800 rounded-full relative transition-colors duration-200 hover:bg-zinc-600"
-        >
-          <div className={`absolute top-1 w-4 h-4 bg-zinc-300 rounded-full transition-transform duration-200 ${
-            inputType === 'habits' ? 'left-1' : 'left-5'
-          }`} />
-        </button>
-        </div> 
+           <div className="flex">
+             <Menu inputType={inputType} setInputType={setInputType} user={user}/>
+           </div> 
        </div>
 
         <div className="cal-container">
@@ -131,6 +131,7 @@ export default function Home() {
                   options={options}
                   updateGoals={updateGoals}
                   selectedOptionValue={selectedOptionValue}
+                  selectedOption={selectedOption}
                   setSelectedOption={setSelectedOption}
                 />
               </div>
@@ -146,7 +147,11 @@ export default function Home() {
           </div>
 
           <GoalProgressBar
-              selectedOptionGoal={goals[selectedOptionValue]?.find(g => g.year === selectedDate.getFullYear())?.goal ?? 0}
+          selectedOptionGoal={
+              goals[selectedOptionValue]?.find(g => 
+                                               new Date(g.end_date).getFullYear() === selectedDate.getFullYear()
+                                              )?.target_count ?? 0
+          }
               selectedOptionCount={currentStats ? currentStats.total : 0}
           />
 

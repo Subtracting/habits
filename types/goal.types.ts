@@ -1,10 +1,11 @@
 export interface GoalData {
-    year: number;
-    goal: number;
+  id: string;
+  habit_id: string;
+  target_count: number;
+  end_date: string; 
+  created_at: string;
 }
 
 export interface GoalsState {
-    [key: string]: GoalData[];
+  [habitName: string]: GoalData[]; 
 }
-
-
