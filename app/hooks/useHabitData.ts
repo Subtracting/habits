@@ -68,7 +68,6 @@ export function useHabitData(userId: string | null, setOptions: React.Dispatch<R
     }, [setOptions, userId]);
 
     const updateDays = useCallback(async (dateToUpdate: Date, count: number, selectedOptionValue: string) => {
-        console.log(selectedOptionValue, userId);
         if (!selectedOptionValue || !userId) return;
 
         const dateStr = toLocalDateString(dateToUpdate);

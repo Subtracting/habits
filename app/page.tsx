@@ -65,7 +65,6 @@ export default function Home() {
     };
 
     const handleUserChange = useCallback((newUser: User | null) => {
-    console.log('User changed to:', newUser);
     setUser(newUser);
   }, []);
 
