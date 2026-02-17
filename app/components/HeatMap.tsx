@@ -32,7 +32,6 @@ export default function HeatMap({
     return (
         <>
           <CalendarHeatmap
-            horizontal={screenWidth > 786 || screenWidth == 0}
             startDate={`${selectedYear-1}-12-31`}
             endDate={`${selectedYear}-12-31`}
             values={selectedOption ? days[selectedOption.value] || [] : []}

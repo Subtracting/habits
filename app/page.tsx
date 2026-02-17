@@ -80,29 +80,19 @@ export default function Home() {
 
     return (
     <div className="flex min-h-screen items-center justify-center font-mono bg-black">
-        <Auth onUserChange={handleUserChange} />
-      <main className="flex min-h-screen flex-col py-16 px-16 text-white bg-black sm:items-start">
-      <div className="flex justify-between items-center w-full">
-        <h1 className="text-6xl">{inputType}.</h1>
-           <div className="flex">
-             <Menu inputType={inputType} setInputType={setInputType} user={user}/>
-           </div> 
-       </div>
-
-        <div className="cal-container">
-          <div className='flex justify-between py-4'>
-
-          {inputType === 'habits' ? (
-              <div 
-                className={`
-                  transition-all duration-500 ease-in-out
-                  ${isAnimating 
-                    ? 'translate-x-0 opacity-100' 
-                    : '-translate-x-full opacity-0'
-                  }
-                `}
-              >
-                <LogHabitInput 
+      <Auth onUserChange={handleUserChange} />
+      <main className="flex min-h-screen flex-col py-8 px-4 sm:py-16 sm:px-16 text-white bg-black w-full max-w-5xl mx-auto">
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-3xl sm:text-6xl">{inputType}.</h1>
+          <div className="flex">
+            <Menu inputType={inputType} setInputType={setInputType} user={user}/>
+          </div>
+        </div>
+        <div className="cal-container w-full overflow-x-auto">
+          <div className='flex flex-col sm:flex-row justify-between py-4 gap-4'>
+            {inputType === 'habits' ? (
+              <div className={`transition-all duration-500 ease-in-out ${isAnimating ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+                <LogHabitInput
                   setSelectedDate={setSelectedDate}
                   countValue={countValue}
                   setCountValue={setCountValue}
@@ -117,16 +107,8 @@ export default function Home() {
                 />
               </div>
             ) : (
-              <div 
-                className={`
-                  transition-all duration-500 ease-in-out
-                  ${isAnimating 
-                    ? 'translate-x-0 opacity-100' 
-                    : '-translate-x-full opacity-0'
-                  }
-                `}
-              >
-                <LogGoalInput 
+              <div className={`transition-all duration-500 ease-in-out ${isAnimating ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+                <LogGoalInput
                   options={options}
                   updateGoals={updateGoals}
                   selectedOptionValue={selectedOptionValue}
@@ -135,38 +117,36 @@ export default function Home() {
                 />
               </div>
             )}
-
             {currentStats ? (
               <div>
                 <CurrentStats currentStats={currentStats}/>
               </div>
             ) : (
-              <p>Select a habit to view statistics.</p>
+              <p className="text-sm sm:text-base">Select a habit to view statistics.</p>
             )}
           </div>
-
           <GoalProgressBar
-          selectedOptionGoal={
-              goals[selectedOptionValue]?.find(g => 
-                                               new Date(g.end_date).getFullYear() === selectedDate.getFullYear()
-                                              )?.target_count ?? 0
-          }
-              selectedOptionCount={currentStats ? currentStats.total : 0}
+            selectedOptionGoal={
+              goals[selectedOptionValue]?.find(g =>
+                new Date(g.end_date).getFullYear() === selectedDate.getFullYear()
+              )?.target_count ?? 0
+            }
+            selectedOptionCount={currentStats ? currentStats.total : 0}
           />
-
-          <div>
-            <HeatMap
-              screenWidth={screenWidth}
-              selectedOption={selectedOption}
-              days={days}
-              selectedYear={selectedDate.getFullYear()}
-              selectedMinValue={minMax.minValue}
-              selectedMaxValue={minMax.maxValue}
-            />
+          <div className="overflow-x-auto">
+            <div style={{ minWidth: '700px' }} className='min-w-max'>
+                <HeatMap
+                  screenWidth={screenWidth}
+                  selectedOption={selectedOption}
+                  days={days}
+                  selectedYear={selectedDate.getFullYear()}
+                  selectedMinValue={minMax.minValue}
+                  selectedMaxValue={minMax.maxValue}
+                />
+            </div>
           </div>
         </div>
-
-        <div className="flex justify-around h-[400px] space-x-4">
+        <div className="flex flex-col sm:flex-row justify-around w-full sm:h-[400px] gap-4 mt-4">
           <WeekdayChart weekdays={weekdaysData} />
           <SimpleLineChart days={days[selectedOptionValue]} />
         </div>

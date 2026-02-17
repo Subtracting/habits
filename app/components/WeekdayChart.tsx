@@ -43,12 +43,13 @@ export default function WeekdayChart({ weekdays }: WeekdayChartProps) {
   const rankedWeekdays = assignRanks(weekdays);
   
   return (
-    <BarChart
-      style={{ width: '400px', height: '400px', aspectRatio: 1.618 }}
-      responsive
-      data={rankedWeekdays}
-      margin={{ top: 25, right: 25, left: 0, bottom: 0 }}
-    >
+    <div className="w-full max-w-[400px]">
+      <BarChart
+        style={{ width: '100%', height: '400px', aspectRatio: 1.618 }}
+        responsive
+          data={rankedWeekdays}
+          margin={{ top: 25, right: 25, left: 0, bottom: 0 }}
+        >
       <XAxis dataKey="weekday" fontSize={14} interval={0}/> 
       <Tooltip 
         cursor={false} 
@@ -63,5 +64,6 @@ export default function WeekdayChart({ weekdays }: WeekdayChartProps) {
         activeBar={<Rectangle fill="white" stroke="white" />} 
       />
     </BarChart>
+    </div>
   );
 }

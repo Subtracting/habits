@@ -24,9 +24,10 @@ export default function SimpleLineChart({ days }: LineChartProps) {
   return (
     <div className="rounded-lg">
 
-      <div className="mx-auto">
+
+    <div className="w-full max-w-[400px]">
       <LineChart 
-            style={{ width: '400px', height: '400px', aspectRatio: 1.618 }}
+            style={{ width: '100%', height: '400px', aspectRatio: 1.618 }}
             responsive
             margin={{ left: 40, right: 40, top: 40, bottom: 0 }} 
             height={500} 
