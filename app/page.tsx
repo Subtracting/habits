@@ -8,7 +8,6 @@ import WeekdayChart from './components/WeekdayChart';
 import SimpleLineChart from './components/LineChart';
 import CurrentStats from './components/CurrentStats';
 import LogHabitInput from './components/LogHabitInput';
-// import LogGoalInput from './components/LogGoalInput';
 
 import { useHabitData } from './hooks/useHabitData';
 import { useHabitStats } from './hooks/useHabitStats';
@@ -24,7 +23,6 @@ import { useGoalData } from './hooks/useGoalData';
 import GoalProgressBar from './components/GoalProgressBar';
 import Menu from './components/Menu';
 import Auth from './components/Auth';
-import LogGoal from './components/LogGoal';
 
 const defaultOptions = [
     createOption("movies"),
