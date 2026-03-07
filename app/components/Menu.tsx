@@ -1,7 +1,6 @@
-// components/Menu.tsx - much cleaner now
 import { User } from '@supabase/supabase-js';
 import AuthMenu from './AuthMenu';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface MenuProps {
   inputType: 'habits' | 'goals';
@@ -11,12 +10,34 @@ interface MenuProps {
 
 export default function Menu({ inputType, setInputType, user }: MenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  
+  const [clickedOutside, setClickedOutside] = useState(false);
+  const myRef = useRef<HTMLDivElement>(null);
+
   const initials = user?.email?.slice(0, 1).toUpperCase() || '';
   const menuIconPath = isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16";
-    
+
+  const handleClickOutside = (e: MouseEvent) => {
+    if (myRef.current && !myRef.current.contains(e.target as Node)) {
+      setClickedOutside(true);
+    }
+  };
+
+  const handleClickInside = () => setClickedOutside(false);
+
+  useEffect(() => {
+    if (clickedOutside) {
+      setIsOpen(false);
+      setClickedOutside(false);
+    }
+  }, [clickedOutside]);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={myRef} onMouseDown={handleClickInside}>
       <button
         className="p-2 rounded-full bg-zinc-800 border border-black text-white hover:bg-zinc-700"
         onClick={() => setIsOpen(!isOpen)}
@@ -37,11 +58,11 @@ export default function Menu({ inputType, setInputType, user }: MenuProps) {
           </svg>
         )}
       </button>
-      
+
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 w-64 bg-zinc-900 z-50 p-4">
           <div className="flex flex-col gap-2">
-            <button 
+            <button
               onClick={() => setInputType('habits')}
               className={`px-3 py-2 text-sm font-medium rounded ${
                 inputType === 'habits' ? 'bg-green-600' : 'bg-gray-800 hover:bg-gray-700'
@@ -49,7 +70,7 @@ export default function Menu({ inputType, setInputType, user }: MenuProps) {
             >
               habits
             </button>
-            <button 
+            <button
               onClick={() => setInputType('goals')}
               className={`px-3 py-2 text-sm font-medium rounded ${
                 inputType === 'goals' ? 'bg-green-600' : 'bg-gray-800 hover:bg-gray-700'
@@ -58,7 +79,7 @@ export default function Menu({ inputType, setInputType, user }: MenuProps) {
               goals
             </button>
           </div>
-          
+
           <AuthMenu user={user} />
         </div>
       )}

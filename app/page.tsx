@@ -8,7 +8,7 @@ import WeekdayChart from './components/WeekdayChart';
 import SimpleLineChart from './components/LineChart';
 import CurrentStats from './components/CurrentStats';
 import LogHabitInput from './components/LogHabitInput';
-import LogGoalInput from './components/LogGoalInput';
+// import LogGoalInput from './components/LogGoalInput';
 
 import { useHabitData } from './hooks/useHabitData';
 import { useHabitStats } from './hooks/useHabitStats';
@@ -24,6 +24,7 @@ import { useGoalData } from './hooks/useGoalData';
 import GoalProgressBar from './components/GoalProgressBar';
 import Menu from './components/Menu';
 import Auth from './components/Auth';
+import LogGoal from './components/LogGoal';
 
 const defaultOptions = [
     createOption("movies"),
@@ -43,7 +44,7 @@ export default function Home() {
     const selectedOptionValue = selectedOption?.value ?? "";
 
     /* custom hooks */
-    const { goals, updateGoals } = useGoalData(user ? user.id : null, setOptions);
+    const { goals, updateGoals, deleteGoal } = useGoalData(user ? user.id : null, setOptions);
     const { days, setDays, updateDays } = useHabitData(user ? user.id : null, setOptions);
     const stats = useHabitStats(days, selectedOptionValue, selectedDate);
     const { minMax, weekdaysData } = useHabitCalculations(days, selectedOptionValue);
@@ -69,88 +70,93 @@ export default function Home() {
   }, []);
 
     useEffect(() => {
-        if (inputType !== displayType) {
-            setIsAnimating(false);
-            setTimeout(() => {
-                setDisplayType(inputType);
-                setTimeout(() => setIsAnimating(true), 250);
-            }, 250); 
-        }
+      if (inputType !== displayType) {
+          setIsAnimating(false); // trigger slide out
+          const timeout = setTimeout(() => {
+              setDisplayType(inputType); // swap content mid-animation
+              setIsAnimating(true);      // trigger slide in
+          }, 300); // match your transition duration
+          return () => clearTimeout(timeout);
+      }
     }, [inputType, displayType]);
 
     return (
-    <div className="flex min-h-screen items-center justify-center font-mono bg-black">
-      <Auth onUserChange={handleUserChange} />
-      <main className="flex min-h-screen flex-col py-8 px-4 sm:py-16 sm:px-16 text-white bg-black w-full max-w-5xl mx-auto">
-        <div className="flex justify-between items-center w-full">
-          <h1 className="text-3xl sm:text-6xl">{inputType}.</h1>
-          <div className="flex">
-            <Menu inputType={inputType} setInputType={setInputType} user={user}/>
-          </div>
-        </div>
-        <div className="cal-container w-full overflow-x-auto">
-          <div className='flex flex-col sm:flex-row justify-between py-4 gap-4'>
-            {inputType === 'habits' ? (
-              <div className={`transition-all duration-500 ease-in-out ${isAnimating ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
-                <LogHabitInput
-                  setSelectedDate={setSelectedDate}
-                  countValue={countValue}
-                  setCountValue={setCountValue}
-                  handleSelectUpdate={handleSelectUpdate}
-                  handleCreate={handleCreate}
-                  options={options}
-                  selectedOption={selectedOption}
-                  selectedDate={selectedDate}
-                  updateDays={updateDays}
-                  setDays={setDays}
-                  selectedOptionValue={selectedOptionValue}
-                />
+        <div className="flex min-h-screen items-center justify-center font-mono bg-black">
+          <Auth onUserChange={handleUserChange} />
+          <main className="flex min-h-screen flex-col py-8 px-4 sm:py-16 sm:px-16 text-white bg-black w-full max-w-5xl mx-auto">
+            <div className="flex justify-between items-center w-full">
+              <h1 className="text-3xl sm:text-6xl">{inputType}.</h1>
+              <div className="flex">
+                <Menu inputType={inputType} setInputType={setInputType} user={user}/>
               </div>
-            ) : (
-              <div className={`transition-all duration-500 ease-in-out ${isAnimating ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
-                <LogGoalInput
-                  options={options}
-                  updateGoals={updateGoals}
-                  selectedOptionValue={selectedOptionValue}
-                  selectedOption={selectedOption}
-                  setSelectedOption={setSelectedOption}
-                />
-              </div>
-            )}
-            {currentStats ? (
-              <div>
-                <CurrentStats currentStats={currentStats}/>
-              </div>
-            ) : (
-              <p className="text-sm sm:text-base">Select a habit to view statistics.</p>
-            )}
-          </div>
-          <GoalProgressBar
-            selectedOptionGoal={
-              goals[selectedOptionValue]?.find(g =>
-                new Date(g.end_date).getFullYear() === selectedDate.getFullYear()
-              )?.target_count ?? 0
-            }
-            selectedOptionCount={currentStats ? currentStats.total : 0}
-          />
-          <div className="overflow-x-auto">
-            <div style={{ minWidth: '700px' }} className='min-w-max'>
-                <HeatMap
-                  screenWidth={screenWidth}
-                  selectedOption={selectedOption}
-                  days={days}
-                  selectedYear={selectedDate.getFullYear()}
-                  selectedMinValue={minMax.minValue}
-                  selectedMaxValue={minMax.maxValue}
-                />
             </div>
-          </div>
+            <div className="cal-container w-full overflow-x-auto">
+              <div className='flex flex-col sm:flex-row justify-between py-4 gap-4'>
+              {displayType === 'habits' ? (
+                  <div className={`transition-all duration-500 ease-in-out ${isAnimating ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'} w-full`}>
+                    <div className="flex flex-col sm:flex-row justify-between gap-4">
+                      <div>
+                        <LogHabitInput
+                          setSelectedDate={setSelectedDate}
+                          countValue={countValue}
+                          setCountValue={setCountValue}
+                          handleSelectUpdate={handleSelectUpdate}
+                          handleCreate={handleCreate}
+                          options={options}
+                          selectedOption={selectedOption}
+                          selectedDate={selectedDate}
+                          updateDays={updateDays}
+                          setDays={setDays}
+                          selectedOptionValue={selectedOptionValue}
+                        />
+                      </div>
+                      <div>
+                        {currentStats ? (
+                          <CurrentStats currentStats={currentStats}/>
+                        ) : (
+                          <p className="text-sm sm:text-base">Select a habit to view statistics.</p>
+                        )}
+                      </div>
+                    </div>
+                    <GoalProgressBar
+                      goals={goals[selectedOptionValue] ?? []}
+                      counts={{
+                        week: currentStats?.weekTotal ?? 0,
+                        month: currentStats?.monthTotal ?? 0,
+                        year: currentStats?.total ?? 0,
+                      }}
+                      updateGoals={updateGoals}
+                      deleteGoal={deleteGoal}
+                      selectedOptionValue={selectedOptionValue}
+                    />
+
+
+                    <div className="overflow-x-auto">
+                      <div style={{ minWidth: '700px' }} className='min-w-max'>
+                        <HeatMap
+                          screenWidth={screenWidth}
+                          selectedOption={selectedOption}
+                          days={days}
+                          selectedYear={selectedDate.getFullYear()}
+                          selectedMinValue={minMax.minValue}
+                          selectedMaxValue={minMax.maxValue}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-around w-full sm:h-[400px] gap-4 mt-4">
+                      <WeekdayChart weekdays={weekdaysData} />
+                      <SimpleLineChart days={days[selectedOptionValue]} />
+                    </div>
+                  </div>
+                ) : ( 
+
+                  <div className={`transition-all duration-500 ease-in-out ${isAnimating ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+                    NOTHING HERE.
+                  </div>
+                )}
+              </div>
+            </div>
+          </main>
         </div>
-        <div className="flex flex-col sm:flex-row justify-around w-full sm:h-[400px] gap-4 mt-4">
-          <WeekdayChart weekdays={weekdaysData} />
-          <SimpleLineChart days={days[selectedOptionValue]} />
-        </div>
-      </main>
-    </div>
-  );
+   );
 }

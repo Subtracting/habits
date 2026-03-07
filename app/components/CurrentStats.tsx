@@ -8,7 +8,7 @@ export default function CurrentStats({
 
   return (
     <>
-        <div>
+        <div className="mb-4">
             <table>
                 <thead>
                     <tr>
