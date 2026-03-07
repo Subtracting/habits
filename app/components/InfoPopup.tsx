@@ -1,49 +1,69 @@
-import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import { Dialog, DialogPanel } from '@headlessui/react'
 import { useState } from 'react'
 
 export default function InfoPopup({
-    infoDate, 
+    infoDate,
     infoCount,
+    updateDays,
+    selectedOptionValue,
     onClose,
 } : {
-    infoDate: string; 
+    infoDate: string;
     infoCount: number;
+    selectedOptionValue: string;
+    updateDays: (dateToUpdate: Date, count: number, selectedOptionValue: string) => void;
     onClose: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(true);
+  const [count, setCount] = useState(infoCount);
 
   function close() {
     setIsOpen(false);
     onClose();
   }
 
+  function submit() {
+    updateDays(new Date(infoDate), count, selectedOptionValue);
+    close();
+  }
+
   return (
-    <>
-      <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close} __demoMode>
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <DialogPanel
-              transition
-              className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
+    <Dialog open={isOpen} as="div" className="relative z-10" onClose={close}>
+      <div className="fixed inset-0 bg-black/50" />
+      <div className="fixed inset-0 z-10 flex items-center justify-center p-4">
+        <DialogPanel
+          transition
+          className="w-full max-w-sm bg-black border-2 border-zinc-950 rounded p-6 duration-200 ease-out data-closed:scale-95 data-closed:opacity-0"
+        >
+          <p className="pb-2 border-b-2 border-zinc-900 text-zinc-400 text-xl mb-4">{infoDate}</p>
+
+          <input
+            autoFocus
+            type="number"
+            min="0"
+            value={count}
+            onChange={e => setCount(Number(e.target.value))}
+            onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") close(); }}
+            className="w-16 mr-4 bg-zinc-950 text-zinc-100 hover:border-zinc-700 rounded px-4 py-1 mb-4 outline-none tabular-nums"
+          />
+            {selectedOptionValue}
+
+          <div className="flex gap-2">
+            <button
+              onClick={submit}
+              className="bg-black hover:bg-zinc-950 text-zinc-100 border-2 border-zinc-900 hover:border-zinc-700 px-4 py-1 rounded"
             >
-              <DialogTitle as="h3" className="text-base/7 font-medium text-white">
-                Day info 
-              </DialogTitle>
-              <p className="mt-2 text-sm/6 text-white/50">
-                Date: {infoDate}, count: {infoCount}.
-              </p>
-              <div className="mt-4">
-                <Button
-                  className='bg-black hover:bg-zinc-950 text-zinc-200 hover:text-zinc-100 border-rose-950 hover:border-rose-900 border-2 px-4 py-1 rounded'
-                  onClick={close}
-                >
-                 OK 
-                </Button>
-              </div>
-            </DialogPanel>
+              submit
+            </button>
+            <button
+              onClick={close}
+              className="bg-black hover:bg-zinc-950 text-zinc-500 hover:text-zinc-300 border-2 border-zinc-900 hover:border-zinc-700 px-4 py-1 rounded"
+            >
+              cancel
+            </button>
           </div>
-        </div>
-      </Dialog>
-    </>
-  )
+        </DialogPanel>
+      </div>
+    </Dialog>
+  );
 }

@@ -62,10 +62,8 @@ function BarRow({ goal, counts, onSave, onDelete, isOnly }: BarRowProps) {
         />
       )}
 
-      {/* Content: left = count/input, right = period */}
       <div className="col-start-1 row-start-1 h-full flex items-center justify-between px-2">
 
-        {/* Left: input or progress */}
         {editing ? (
           <div className="flex items-center gap-1">
             <input
@@ -90,15 +88,14 @@ function BarRow({ goal, counts, onSave, onDelete, isOnly }: BarRowProps) {
         ) : (
           <button
             onClick={() => { setDraft(String(target)); setEditing(true); }}
-            className="text-sm tabular-nums"
-            style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "inherit", color: mainColor }}
+            className="text-m tabular-nums"
+            style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "inherit", color: 'black'}}
           >
             {count} / {target}
             <span className="ml-1.5" style={{ color: dimColor }}>({percentage}%)</span>
           </button>
         )}
 
-        {/* Right: locked period label or period picker */}
         <div className="flex items-center gap-1 shrink-0">
           {goal ? (
             <span
@@ -138,7 +135,6 @@ function BarRow({ goal, counts, onSave, onDelete, isOnly }: BarRowProps) {
         </div>
       </div>
 
-      {/* Trash — absolutely positioned, never affects layout */}
       {showTrash && (
         <button
           onClick={onDelete}

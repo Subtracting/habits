@@ -25,6 +25,15 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+}
+
 .heat-scroll {
   overflow-x: scroll;
 }
@@ -51,12 +60,9 @@ body {
 .react-calendar-heatmap .color-scale-9 { fill: #c6e48b; }
 .react-calendar-heatmap .color-scale-10 { fill: #d6e685; }
 
-.react-calendar-heatmap .color-today { fill: red; }
-
-.react-calendar-heatmap rect[data-date="${today}"] {
-    stroke: #222;
-    stroke-width: 2px;
-    rx: 3px;
+.react-calendar-heatmap .color-today {
+  stroke: grey;
+  stroke-width: 1px;
 }
 
 .react-calendar-heatmap text {

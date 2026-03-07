@@ -60,12 +60,12 @@ export default function Menu({ inputType, setInputType, user }: MenuProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-64 bg-zinc-900 z-50 p-4">
+        <div className="absolute right-0 top-full mt-2 w-64 bg-black border-1 border-zinc-900 z-50 p-4">
           <div className="flex flex-col gap-2">
             <button
               onClick={() => setInputType('habits')}
               className={`px-3 py-2 text-sm font-medium rounded ${
-                inputType === 'habits' ? 'bg-green-600' : 'bg-gray-800 hover:bg-gray-700'
+                inputType === 'habits' ? 'bg-green-600' : 'bg-zinc-800 hover:bg-zinc-700'
               }`}
             >
               habits
@@ -73,7 +73,7 @@ export default function Menu({ inputType, setInputType, user }: MenuProps) {
             <button
               onClick={() => setInputType('goals')}
               className={`px-3 py-2 text-sm font-medium rounded ${
-                inputType === 'goals' ? 'bg-green-600' : 'bg-gray-800 hover:bg-gray-700'
+                inputType === 'goals' ? 'bg-green-600' : 'bg-zinc-800 hover:bg-zinc-700'
               }`}
             >
               goals

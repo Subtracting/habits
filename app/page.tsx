@@ -132,9 +132,9 @@ export default function Home() {
                     <div className="overflow-x-auto">
                       <div style={{ minWidth: '700px' }} className='min-w-max'>
                         <HeatMap
-                          screenWidth={screenWidth}
                           selectedOption={selectedOption}
                           days={days}
+                          updateDays={updateDays}
                           selectedYear={selectedDate.getFullYear()}
                           selectedMinValue={minMax.minValue}
                           selectedMaxValue={minMax.maxValue}

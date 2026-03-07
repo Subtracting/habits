@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
@@ -17,20 +16,15 @@ export default function AuthMenu({ user }: AuthMenuProps) {
     e.preventDefault();
     setError('');
     const { error: signUpError } = await supabase.auth.signUp({ email, password });
-    if (signUpError) {
-      setError(signUpError.message);
-    } else {
-      alert('Check your email for the confirmation link!');
-    }
+    if (signUpError) setError(signUpError.message);
+    else alert('Check your email for the confirmation link!');
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (signInError) {
-      setError(signInError.message);
-    }
+    if (signInError) setError(signInError.message);
   };
 
   const handleSignOut = async () => {
@@ -38,77 +32,49 @@ export default function AuthMenu({ user }: AuthMenuProps) {
     await supabase.auth.signOut();
   };
 
+  const inputClass = "w-full px-4 py-2 rounded bg-zinc-950 text-zinc-100 border-2 border-zinc-900 hover:border-zinc-700 focus:border-zinc-700 outline-none text-sm transition-colors";
+  const btnClass = "w-full px-4 py-1 text-sm rounded border-2 border-zinc-900 hover:border-zinc-700 bg-zinc-900 hover:bg-zinc-800 transition-colors";
+
   if (user) {
     return (
       <div className="mt-4 space-y-2">
-        <div className="px-3 py-3 bg-gray-800 rounded">
-          <span className="block text-xs text-gray-400 mb-1">Signed in as</span>
-          <span className="block text-sm font-medium text-white truncate">
-            {user.email}
-          </span>
+        <div className="px-4 py-2 border-2 border-zinc-900 rounded">
+          <span className="block text-xs text-zinc-600 mb-1">signed in as</span>
+          <span className="block text-sm text-zinc-300 truncate">{user.email}</span>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="w-full px-3 py-2 text-sm text-white bg-gray-700 hover:bg-gray-600 rounded transition-colors"
-        >
-          Sign Out
+        <button onClick={handleSignOut} className={`${btnClass} text-zinc-500 hover:text-zinc-300`}>
+          sign out
         </button>
       </div>
     );
   }
 
   return (
-    <div className="mt-4 space-y-4 px-3">
+    <div className="mt-4 space-y-3 bg-black ">
       {error && (
-        <div className="px-3 py-2 text-red-400 text-sm bg-red-900/20 rounded">
-          {error}
-        </div>
+        <p className="text-xs text-red-400 px-1">{error}</p>
       )}
-      
-      <form onSubmit={handleSignIn} className="space-y-3">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          style={{
-            WebkitBoxShadow: '0 0 0 1000px rgb(31 41 55) inset',
-            WebkitTextFillColor: 'white'
-          }}
-          required
-        />
-        <button
-          type="submit"
-          className="w-full px-3 py-2 text-sm font-semibold rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-        >
-          Sign In
+
+      <form onSubmit={handleSignIn} className="space-y-2">
+        <input type="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} required />
+        <input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} required />
+        <button type="submit" className={`${btnClass} text-zinc-100`}>
+          sign in
         </button>
       </form>
-      
+
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-700"></div>
+          <div className="w-full border-t border-zinc-900" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="px-2 bg-gray-900 text-gray-400">or</span>
+          <span className="px-2 bg-black text-zinc-600">or</span>
         </div>
       </div>
-      
+
       <form onSubmit={handleSignUp}>
-        <button
-          type="submit"
-          className="w-full px-3 py-2 text-sm font-semibold rounded bg-green-600 text-white hover:bg-green-700 transition-colors"
-        >
-          Sign Up
+        <button type="submit" className={`${btnClass} text-zinc-500 hover:text-zinc-300`}>
+          sign up
         </button>
       </form>
     </div>
