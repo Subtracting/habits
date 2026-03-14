@@ -80,7 +80,7 @@ input:-webkit-autofill:active {
     max-width: 900px;
     padding: 4px;
     display: block;
-    overflow-x: scroll;
+    overflow-x: hidden;
 }
 
 input[type="number"] {

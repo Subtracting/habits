@@ -12,7 +12,6 @@ import LogHabitInput from './components/LogHabitInput';
 import { useHabitData } from './hooks/useHabitData';
 import { useHabitStats } from './hooks/useHabitStats';
 import { useHabitCalculations } from './hooks/useHabitCalculations';
-import { useScreenWidth } from './hooks/useScreenWidth';
 import { createOption } from './utils/optionHelpers';
 
 import type { Option } from '@/types/option.types';
@@ -46,11 +45,9 @@ export default function Home() {
     const { days, setDays, updateDays } = useHabitData(user ? user.id : null, setOptions);
     const stats = useHabitStats(days, selectedOptionValue, selectedDate);
     const { minMax, weekdaysData } = useHabitCalculations(days, selectedOptionValue);
-    const screenWidth = useScreenWidth();
 
     const currentStats = stats[selectedOptionValue];
 
-    const [isAnimating, setIsAnimating] = useState(true);
     const [displayType, setDisplayType] = useState(inputType);
 
     const handleCreate = (inputValue: string) => {
@@ -69,11 +66,9 @@ export default function Home() {
 
     useEffect(() => {
       if (inputType !== displayType) {
-          setIsAnimating(false); // trigger slide out
           const timeout = setTimeout(() => {
-              setDisplayType(inputType); // swap content mid-animation
-              setIsAnimating(true);      // trigger slide in
-          }, 300); // match your transition duration
+              setDisplayType(inputType); 
+          }, 300); 
           return () => clearTimeout(timeout);
       }
     }, [inputType, displayType]);
@@ -91,7 +86,7 @@ export default function Home() {
             <div className="cal-container w-full overflow-x-auto">
               <div className='flex flex-col sm:flex-row justify-between py-4 gap-4'>
               {displayType === 'habits' ? (
-                  <div className={`transition-all duration-500 ease-in-out ${isAnimating ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'} w-full`}>
+                  <div>
                     <div className="flex flex-col sm:flex-row justify-between gap-4">
                       <div>
                         <LogHabitInput
@@ -148,7 +143,7 @@ export default function Home() {
                   </div>
                 ) : ( 
 
-                  <div className={`transition-all duration-500 ease-in-out ${isAnimating ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+                  <div>
                     NOTHING HERE.
                   </div>
                 )}

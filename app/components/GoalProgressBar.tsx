@@ -14,6 +14,26 @@ function getCount(counts: { week: number; month: number; year: number }, period:
   return counts[period] ?? 0;
 }
 
+function daysIntoYear(date: Date){
+    return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
+}
+
+function calcPrediction(count: number, period: PeriodType) {
+    const today = new Date();
+    if (period == 'week') {
+        const daysPassed = today.getDay();
+        return (count / daysPassed) * 7
+    }
+    else if (period == 'month') {
+        const daysPassed = today.getDate(); 
+        return (count / daysPassed) * 31 
+    }
+    else {
+        const daysPassed = daysIntoYear(today); 
+        return (count / daysPassed) * 365 
+    }
+}
+
 interface BarRowProps {
   goal: GoalData | null;
   counts: { week: number; month: number; year: number };
@@ -31,11 +51,11 @@ function BarRow({ goal, counts, onSave, onDelete, isOnly }: BarRowProps) {
   const activePeriod: PeriodType = goal ? goal.period_type : selectedPeriod;
   const target = goal?.target_count ?? 0;
   const count = getCount(counts, activePeriod);
+  const prediction = Math.round(calcPrediction(count, selectedPeriod));
   const progress = target > 0 ? Math.min(100, (count / target) * 100) : 0;
   const percentage = target > 0 ? (count / target * 100).toFixed(1) : "0.0";
-  const textDark = !editing && progress > 30;
-  const dimColor = textDark ? "rgba(0,0,0,0.45)" : "#52525b";
-  const mainColor = textDark ? "#000" : "#e4e4e7";
+  const textDark = !editing;
+  const dimColor = textDark ? "rgba(0,0,0,0.45)" : "#7d7c7c";
 
   const commit = () => {
     const num = parseInt(draft, 10);
@@ -54,7 +74,6 @@ function BarRow({ goal, counts, onSave, onDelete, isOnly }: BarRowProps) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Progress fill — hidden while editing */}
       {!editing && (
         <div
           className="h-full bg-green-500 rounded-sm transition-all duration-500 ease-in-out col-start-1 row-start-1"
@@ -98,13 +117,16 @@ function BarRow({ goal, counts, onSave, onDelete, isOnly }: BarRowProps) {
 
         <div className="flex items-center gap-1 shrink-0">
           {goal ? (
-            <span
+            <span className="text-zinc-500"
               style={{
-                color: dimColor, fontFamily: "inherit",
+                fontFamily: "inherit",
                 letterSpacing: "0.05em", textTransform: "uppercase", fontSize: "10px",
                 marginRight: showTrash ? "20px" : "0", transition: "margin 0.15s"
               }}
             >
+                <span className="mr-4 text-white">
+                  current pace: {prediction} 
+                </span>
               {PERIOD_OPTIONS.find(p => p.key === activePeriod)?.label}
             </span>
           ) : (
