@@ -42,7 +42,7 @@ export default function HeatMap({
 
     const handleClick = (date: string, count: number) => {
         const newDate = new Date(date);
-        const formattedDate = newDate.getDate() + '/' + newDate.getMonth() + '/' + newDate.getFullYear();
+        const formattedDate = (newDate.getDate() + "").padStart(2, "0") + '/' + (newDate.getMonth() + "").padStart(2, "0") + '/' + newDate.getFullYear();
         setInfoPopupData({ date: formattedDate, count });
     };
 

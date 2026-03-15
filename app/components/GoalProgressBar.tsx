@@ -21,7 +21,7 @@ function daysIntoYear(date: Date){
 function calcPrediction(count: number, period: PeriodType) {
     const today = new Date();
     if (period == 'week') {
-        const daysPassed = today.getDay();
+        const daysPassed = ((today.getDay() + 6) % 7) + 1;
         return (count / daysPassed) * 7
     }
     else if (period == 'month') {
@@ -107,7 +107,7 @@ function BarRow({ goal, counts, onSave, onDelete, isOnly }: BarRowProps) {
         ) : (
           <button
             onClick={() => { setDraft(String(target)); setEditing(true); }}
-            className="text-m tabular-nums"
+            className="text-xs md:text-base tabular-nums"
             style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "inherit", color: 'black'}}
           >
             {count} / {target}
@@ -117,15 +117,15 @@ function BarRow({ goal, counts, onSave, onDelete, isOnly }: BarRowProps) {
 
         <div className="flex items-center gap-1 shrink-0">
           {goal ? (
-            <span className="text-zinc-500"
+            <span className="text-zinc-500 text-sm md:text-base"
               style={{
                 fontFamily: "inherit",
-                letterSpacing: "0.05em", textTransform: "uppercase", fontSize: "10px",
+                letterSpacing: "0.05em", textTransform: "uppercase",
                 marginRight: showTrash ? "20px" : "0", transition: "margin 0.15s"
               }}
             >
                 <span className="mr-4 text-white">
-                  current pace: {prediction} 
+                  {prediction} 
                 </span>
               {PERIOD_OPTIONS.find(p => p.key === activePeriod)?.label}
             </span>
